@@ -2,7 +2,7 @@ var yql = require('yql');
 var async = require('async');
 var fs = require('fs');
 
-var contacts = Array();
+var contacts = Object();
 var logins = Array();
 
 var repository = "timmolter/XChange";
@@ -15,7 +15,6 @@ console.log(getContributorsQuery);
 new yql.exec(getContributorsQuery, function(response) {
   var authors = response.query.results.json.json;
   authors.forEach(function(author){
-    // console.log(author.author.login);
     logins.push(author.author.login);
   });
 
@@ -24,21 +23,40 @@ new yql.exec(getContributorsQuery, function(response) {
   var queryFuncs = Array();
 
   logins.forEach(function(login){
-    var contact = Object();
-    contact.login = login;
+    contacts[login] = Object();
     var url = "http://github.com/" + login;
+
     var getEmailQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.email'";
 
     queryFuncs.push(function(callback){
         new yql.exec(getEmailQuery, function(response) {
+          // console.log(response.query.results.results);
           if(response.query.results.results != null){
-            var email = response.query.results.results.a.content;
-            contact.email = email;
+            if(response.query.results.results.a != null){
+              var email = response.query.results.results.a.content;
+              // console.log(email);
+              contacts[login].email = email;
+            }
           }
-          contacts.push(contact);
           callback();
         });
     });
+
+    var getNameQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.vcard-fullname'";
+
+    queryFuncs.push(function(callback){
+        new yql.exec(getNameQuery, function(response) {
+          // console.log(response.query.results.results);
+          if(response.query.results.results != null ){
+            if(response.query.results.results.span != null){
+              var name = response.query.results.results.span.content;
+              contacts[login].name = name;
+            }
+          }
+          callback();
+        });
+    });
+
   });
 
   async.parallel(queryFuncs, function(){
@@ -55,6 +73,3 @@ new yql.exec(getContributorsQuery, function(response) {
   });
 
 });
-
-function getEmails( logins ){
-}
