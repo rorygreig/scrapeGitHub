@@ -5,6 +5,8 @@ var fs = require('fs');
 var contacts = Object();
 var logins = Array();
 
+//TODO: could also implement this using github api, eg.: https://api.github.com/repos/timmolter/xchange/contributors
+
 var repository = "timmolter/XChange";
 var url = "http://github.com/" + repository + "/graphs/contributors-data";
 
