@@ -70,6 +70,23 @@ new yql.exec(getContributorsQuery, function(response) {
           console.log("JSON saved to " + outputFilename);
         }
     });
+
+    var csv = "";
+
+    logins.forEach( function(login){
+        csv += login + "," + contacts[login].name + "," + contacts[login].email + "\n";
+    });
+
+    var outputFilename = './contacts.csv';
+
+    fs.writeFile(outputFilename, csv, function(err) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log("CSV saved to " + outputFilename);
+        }
+    });
+
   });
 
 });
