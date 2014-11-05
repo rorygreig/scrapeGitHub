@@ -2,6 +2,7 @@
   "name": "scrapeGitHub",
   "dependencies": {
     "yql": "",
-    "async": ""
+    "async": "",
+    "request": ""
   }
 }

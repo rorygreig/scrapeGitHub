@@ -5,11 +5,8 @@ var fs = require('fs');
 var contacts = Object();
 var logins = Array();
 
-//TODO: could also implement this using github api,
-//eg. to get all contributors for a repo: https://api.github.com/repos/timmolter/xchange/contributors
-//to get data for a user: https://api.github.com/users/timmolter
-
-var repository = "timmolter/XChange";
+var repository = "nanotube/supybot-bitcoin-marketmonitor";
+var reponame = "supybot-bitcoin-marketmonitor";
 var url = "http://github.com/" + repository + "/graphs/contributors-data";
 
 var getContributorsQuery = "select * from json where url='" + url + "'";
@@ -17,6 +14,7 @@ var getContributorsQuery = "select * from json where url='" + url + "'";
 console.log(getContributorsQuery);
 
 new yql.exec(getContributorsQuery, function(response) {
+  console.log(response);
   var authors = response.query.results.json.json;
   authors.forEach(function(author){
     logins.push(author.author.login);
@@ -65,32 +63,42 @@ new yql.exec(getContributorsQuery, function(response) {
 
   async.parallel(queryFuncs, function(){
     console.log(contacts);
-    var outputFilename = './contacts.json';
-
-    fs.writeFile(outputFilename, JSON.stringify(contacts, null, 4), function(err) {
-        if(err) {
-          console.log(err);
-        } else {
-          console.log("JSON saved to " + outputFilename);
-        }
-    });
-
-    var csv = "";
-
-    logins.forEach( function(login){
-        csv += login + "," + contacts[login].name + "," + contacts[login].email + "\n";
-    });
-
-    var outputFilename = './contacts.csv';
-
-    fs.writeFile(outputFilename, csv, function(err) {
-        if(err) {
-          console.log(err);
-        } else {
-          console.log("CSV saved to " + outputFilename);
-        }
-    });
-
+    saveFiles(contacts);
+    // sendEmails(contacts);
   });
 
 });
+
+// function sendEmails(contacts){
+//
+// }
+
+function saveFiles(contacts){
+  var outputFilename = './contacts'+ reponame +'.json';
+
+  fs.writeFile(outputFilename, JSON.stringify(contacts, null, 4), function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("JSON saved to " + outputFilename);
+      }
+  });
+
+  var csv = "";
+
+  logins.forEach( function(login){
+    if(contacts[login].name !== undefined){
+      csv += login + "," + contacts[login].name + "," + contacts[login].email + "\n";
+    }
+  });
+
+  var outputFilename = './contacts'+ reponame +'.csv';
+
+  fs.writeFile(outputFilename, csv, function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("CSV saved to " + outputFilename);
+      }
+  });
+}
