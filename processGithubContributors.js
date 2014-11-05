@@ -5,6 +5,8 @@ var fs = require('fs');
 var contacts = Object();
 var logins = Array();
 
+var repos = ["nanotube/supybot-bitcoin-marketmonitor"];
+
 var repository = "nanotube/supybot-bitcoin-marketmonitor";
 var reponame = "supybot-bitcoin-marketmonitor";
 var url = "http://github.com/" + repository + "/graphs/contributors-data";
