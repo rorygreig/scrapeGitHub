@@ -196,88 +196,35 @@ console.log("Number of repos = " + repos.length);
 
 var users = Array();
 
-var repo = repos[0];
+var queryFuncs = Array();
 
-getContributorsForRepo(repo.user, repo.repo, function(contributors){
-  // console.log(contributors);
-  users = users.concat(contributors);
+repos.forEach(function(repo){
+  queryFuncs.push(function(callback){
+      getContributorsForRepo(repo.user, repo.repo, function(contributors){
+        users = users.concat(contributors);
+        callback();
+      });
+  });
 });
 
-var repo = repos[1];
-
-getContributorsForRepo(repo.user, repo.repo, function(contributors){
-  users = users.concat(contributors);
+async.parallel(queryFuncs, function(){
+  //remove duplicates from array
+  console.log(users);
+  console.log("length of users array: " + users.length);
+  // contributors.Filter()
 });
 
-// repos.forEach(function(repo){
-//   var url = "http://github.com/" + repo + "/graphs/contributors-data";
+// var repo = repos[0];
 //
-//   var getContributorsQuery = "select * from json where url='" + url + "'";
+// getContributorsForRepo(repo.user, repo.repo, function(contributors){
+//   // console.log(contributors);
+//   users = users.concat(contributors);
+// });
 //
-//   console.log(getContributorsQuery);
+// var repo = repos[1];
 //
-//   new yql.exec(getContributorsQuery, function(response) {
-//     console.log(response);
-//     if(response.query != null){
-//       if(response.query.results != null){
-//         if(response.query.results.json != null){
-//           if(response.query.results.json.json != null){
-//             var authors = response.query.results.json.json;
-//             authors.forEach(function(author){
-//               logins.push(author.author.login);
-//             });
-//           }
-//         }
-//       }
-//     }
-//     console.log(logins);
-//
-//     var queryFuncs = Array();
-//
-//     logins.forEach(function(login){
-//       contacts[login] = Object();
-//       contacts[login].repo = repo;
-//
-//       var url = "http://github.com/" + login;
-//
-//       var getEmailQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.email'";
-//
-//       queryFuncs.push(function(callback){
-//           new yql.exec(getEmailQuery, function(response) {
-//             // console.log(response.query.results.results);
-//             if(response.query.results.results != null){
-//               if(response.query.results.results.a != null){
-//                 var email = response.query.results.results.a.content;
-//                 contacts[login].email = email;
-//               }
-//             }
-//             callback();
-//           });
-//       });
-//
-//       var getNameQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.vcard-fullname'";
-//
-//       queryFuncs.push(function(callback){
-//           new yql.exec(getNameQuery, function(response) {
-//             // console.log(response.query.results.results);
-//             if(response.query.results.results != null ){
-//               if(response.query.results.results.span != null){
-//                 var name = response.query.results.results.span.content;
-//                 contacts[login].name = name;
-//               }
-//             }
-//             callback();
-//           });
-//       });
-//
-//     });
-//
-//     async.parallel(queryFuncs, function(){
-//       console.log(contacts);
-//       saveFiles(contacts);
-//     });
-//
-//   });
+// getContributorsForRepo(repo.user, repo.repo, function(contributors){
+//   users = users.concat(contributors);
 // });
 
 function getContributorsForRepo(user, repoName, callback){
