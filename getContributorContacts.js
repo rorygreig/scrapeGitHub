@@ -233,15 +233,13 @@ async.parallel(repoQueryFuncs, function(){
   });
 
   async.parallel(emailQueryFuncs, function(){
-    // users.forEach(function(user){
-    //   console.log(user);
-    // });
-    console.log(users);
-
+    
     //filter users with no email addresses
     uniqueUsers = uniqueUsers.filter(function(user){
       return(user.email !== undefined);
     });
+
+    console.log(uniqueUsers);
 
     //save to JSON file here
     saveToJSON(uniqueUsers);
