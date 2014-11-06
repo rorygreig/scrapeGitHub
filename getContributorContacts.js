@@ -211,21 +211,28 @@ async.parallel(queryFuncs, function(){
   //remove duplicates from array
   console.log(users);
   console.log("length of users array: " + users.length);
-  // contributors.Filter()
+
+  users = users.filter(function(user){
+    return( user !== undefined && user.login !== undefined);
+  });
+
+  var uniqueUsers = uniqueBy(users, JSON.stringify);
+
+  console.log("length of unique users array: " + uniqueUsers.length);
+
+  uniqueUsers.forEach(function(user){
+    // if(user !== undefined)
+    console.log(user.login);
+  });
 });
 
-// var repo = repos[0];
-//
-// getContributorsForRepo(repo.user, repo.repo, function(contributors){
-//   // console.log(contributors);
-//   users = users.concat(contributors);
-// });
-//
-// var repo = repos[1];
-//
-// getContributorsForRepo(repo.user, repo.repo, function(contributors){
-//   users = users.concat(contributors);
-// });
+function uniqueBy(a, key) {
+    var seen = {};
+    return a.filter(function(item) {
+        var k = key(item);
+        return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+    })
+}
 
 function getContributorsForRepo(user, repoName, callback){
   github.repos.getContributors({
