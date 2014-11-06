@@ -225,10 +225,8 @@ async.parallel(repoQueryFuncs, function(){
   uniqueUsers.forEach(function(user){
     emailQueryFuncs.push(function(callback){
         getEmailForUser(user.login, function(email){
-          if(email !== null){
-            user.email = email;
-            console.log(email);
-          }
+          user.email = email;
+          console.log(email);
           callback();
         });
     });
@@ -239,6 +237,14 @@ async.parallel(repoQueryFuncs, function(){
     //   console.log(user);
     // });
     console.log(users);
+
+    //filter users with no email addresses
+    uniqueUsers = uniqueUsers.filter(function(user){
+      return(user.email !== undefined);
+    });
+
+    //save to JSON file here
+    saveToJSON(uniqueUsers);
   });
 
 });
@@ -274,7 +280,7 @@ function getEmailForUser(login, callback){
   });
 }
 
-function saveFiles(contacts){
+function saveToJSON(contacts){
   var outputFilename = './contacts.json';
 
   fs.appendFile(outputFilename, JSON.stringify(contacts, null, 4), function(err) {
@@ -284,6 +290,10 @@ function saveFiles(contacts){
         console.log("JSON saved to " + outputFilename);
       }
   });
+
+}
+
+function saveToCSV(contacts){
 
   var csv = "";
 
