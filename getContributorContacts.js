@@ -193,16 +193,20 @@ var repos = [
             ];
 
 console.log("Number of repos = " + repos.length);
-console.log(repos);
 
-github.user.getFrom({
-    user: login
-}, function(err, res) {
-    console.log("\n\n");
-    if(res.email !== undefined){
-      console.log(res.email);
-      callback(res.email);
-    }
+var users = Array();
+
+var repo = repos[0];
+
+getContributorsForRepo(repo.user, repo.repo, function(contributors){
+  // console.log(contributors);
+  users = users.concat(contributors);
+});
+
+var repo = repos[1];
+
+getContributorsForRepo(repo.user, repo.repo, function(contributors){
+  users = users.concat(contributors);
 });
 
 // repos.forEach(function(repo){
@@ -276,8 +280,15 @@ github.user.getFrom({
 //   });
 // });
 
-function getContributors(repo, callback){
-
+function getContributorsForRepo(user, repoName, callback){
+  github.repos.getContributors({
+      user: user,
+      repo: repoName
+  }, function(err, res) {
+      console.log("\n\n");
+      // console.log(res);
+      callback(res);
+  });
 }
 
 function getEmailForUser(login, callback){
@@ -286,7 +297,7 @@ function getEmailForUser(login, callback){
   }, function(err, res) {
       console.log("\n\n");
       if(res.email !== undefined){
-        console.log(res.email);
+        // console.log(res.email);
         callback(res.email);
       }
   });
