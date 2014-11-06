@@ -3,6 +3,7 @@
   "dependencies": {
     "yql": "",
     "async": "",
-    "request": ""
+    "request": "",
+    "github": ""
   }
 }

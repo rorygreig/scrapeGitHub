@@ -1,250 +1,296 @@
 var yql = require('yql');
 var async = require('async');
 var fs = require('fs');
+var GitHubApi = require("github");
 
 //TODO: could use github API wrapper package: https://www.npmjs.org/package/github
 
 var contacts = Object();
 var logins = Array();
 
+var github = new GitHubApi({
+    // required
+    version: "3.0.0",
+    // optional
+    debug: true,
+    protocol: "https",
+    timeout: 5000
+});
+
+var githubUserName = process.argv[2];
+var githubPassWord = process.argv[3];
+
+github.authenticate({
+    type: "basic",
+    username: githubUserName,
+    password: githubPassWord
+});
+
 var repos = [
-              "nanotube/supybot-bitcoin-marketmonitor",
-              "goteppo/ArBit",
-              "Sprylitol/btc-e_Trade_bot",
-              "hyppo/Redbit",
-              "mathisonian/benjamin",
-              "wildbunny/bitcoinTradingFramework",
-              "therussianphysicist/btc-trader",
-              "JulyIGHOR/QtBitcoinTrader",
-              "maxme/bitcoin-arbitrage",
-              "gferrin/bitfinex",
-              "lookfirst/bitfinex-promise",
-              "ziggamon/node-bitcoin-trader",
-              "Sea-of-BTC/Bitcoin-Trading-Client",
-              "ipsBruno/trade-bot-btce",
-              "maxcountryman/cryptotrade",
-              "guifre/BTCWolf",
-              "brandonrobertz/virtualcurrency-trading-alerts",
-              "cheseaux/BitcoinTradingSystem",
-              "pubnub/pubnub-bitcoin",
-              "pentarh/btctrading-lib",
-              "jwilkins/bitfinex",
-              "scottbarr/bitfinex",
-              "golikcoin/BitFinex",
-              "v4n/bitfinex",
-              "coolacid/bfxtrade",
-              "npp1993/bitfinex-api",
-              "gitmens/BitfinexToday",
-              "twobeeb/BitfinexAPI",
-              "KobeLeysen/BitfinexAPI",
-              "bitbot-bitfinex",
-              "gekko-bitfinex",
-              "fractaldroid/bitfinex_orderbook",
-              "velhoti/Cbot-Bitfinex",
-              "NoWayHoze/nowayhoze.bitfinex",
-              "evdubs/Harmonia",
-              "MarkusTeufelberger/bitfinex2ledger",
-              "caktux/bitfinex_api_python",
-              "mariodian/bitfinex-auto-lend",
-              "NoWayHoze/b___del_this",
-              "dutchcoders/tradecollector",
-              "cassus/btc-trader",
-              "cthunman/btc_py_arb",
-              "Herka/Bitcoin-Python-Livecharts",
-              "sam808/mint-bitcoin",
-              "brendanjcaffrey/bitcoin-notification-center-widget",
-              "wijagels/btc-price-check",
-              "pentarh/btctrading-lib",
-              "tech-no-crat/bitcoineer",
-              "node-traderbot-bitcoin",
-              "kushti/btce-scala",
-              "orangeudav/bitcoin_tools",
-              "aandrewjeski/arcade",
-              "ericjang/cryptocurrency_arbitrage",
-              "kevinjcash/bitbot",
-              "ssgier/Brahmian2",
-              "pejrak/stampede",
-              "kanybal/bitcoins",
-              "towski/bitcoin_trader",
-              "mateodelnorte/coinbase",
-              "trexmatt/OKCoin-API",
-              "siclark/btcchina",
-              "opaolini/python-bitcurex",
-              "voidloop/krakenapi",
-              "5an1ty/kraken-api",
-              "Beldur/kraken-go-api-client",
-              "veox/python3-krakenex",
-              "yfme/BTCChinaTrade",
-              "dyzz/btcchina",
-              "TerrorJack/btcchina.py",
-              "zfei/btcchina-bot",
-              "tjulk/Btcchina",
-              "siclark/btcchina",
-              "qinjiandong2010/btcchina",
-              "GeforceLee/BtcChina",
-              "prinyap/btcchina",
-              "shallwe/btcchina_agent",
-              "Lewis-Clayton/Kublai",
-              "BTCChina/btcchina-api-cpp",
-              "BTCChina/btcchina-websocket-api-python",
-              "hemon/btcchina-php-sdk",
-              "domnli/btcchina.api",
-              "agent462/chinashop",
-              "sathoro/BTCChina-MarketMaker",
-              "osleg/btcchinaBot",
-              "Shieffan/btcchina_deal",
-              "lamassu/lamassu-btcchina",
-              "dasixi/bitbot-btcchina",
-              "shuaishuai/btcchina-cli",
-              "buluzhai/btcchina-enhancement",
-              "xianda/btcchina-python-api",
-              "goace/bitcoin-ticker",
-              "wulinlw/btcchina_php_api",
-              "wulinlw/btcchina_php_api",
-              "carica/btcchina-websocket-api",
-              "kasuganosora/nodeBtcchinaapi",
-              "rarach/exchange-bots",
-              "tonychee7000/BtcChinaRT",
-              "sirkapore/kraken_watch",
-              "greentheo/krakenForR",
-              "pstauble/BTC-Trend-Algorithm",
-              "veox/krakenex",
-              "payward/kraken-api-client",
-              "nothingisdead/npm-kraken-api",
-              "kraken-io/kraken-ruby",
-              "leishman/kraken_ruby",
-              "Jonahss/bitstamp-request",
-              "logicalwire/bitstamp-API",
-              "canselcik/bitstamp_stoploss",
-              "francesco-bracchi/bitstamp-api",
-              "jdilag/bitstamp-angular",
-              "michie1/Bitstamp-notifier",
-              "9uuso/bitstamp-vwap",
-              "tgerring/bitstamp-js",
-              "BitcoinMafia/bitstamp_api",
-              "PamExx/Bitcoin---Bitstamp",
-              "sirloins/bitstamp_utils",
-              "makevoid/bitstamp_bot",
-              "jesuRule/custom_bitstamp",
-              "socec/bitstamp-simple",
-              "maxtsepkov/nodejs-bitstamp2",
-              "liw0/pyBitstampTicker",
-              "conejoninja/bitstamp-php-api",
-              "LuKaa/Bitstamp-API-CSharp",
-              "ghandmann/perl-webservice-bitstamp",
-              "alstonfernandez21/bitstamp_python_api",
-              "ericcj24/bitstamp.api.monitor1",
-              "peawormsworth/Finance-BitStamp-Socket",
-              "kojnapp/bitstamp",
-              "askmike/bitstamp",
-              "migrap/Bitstamp",
-              "kmadac/bitstamp-python-client",
-              "unwitting/bitstampy",
-              "willmoss/bitstamp-php-api",
-              "nyg/bitstamp-ticker",
-              "isotope11/bitstampede",
-              "lamassu/lamassu-bitstamp",
-              "pulsecat/cryptrade",
-              "askmike/bitstamp-ws",
-              "mmazi/bitstamp-api",
-              "hivewallet/hiveapp-bitstamp",
-              "matmar10/bitstamp",
-              "esneider/bitstamp",
-              "LoufL/bitstamp",
-              "hanklords/bitstamp",
-              "tgerring/hiveapp-bitstamptrader",
-              "apancutt/bitstamp-api-php",
-              "newell-purdue/bitstamper",
-              "cgag/bitstamp-client",
-              "5an1ty/bitstamp-api",
-              "ajph/bitstamp-go",
-              "Narsil/bitstamp-go",
-              "indrekj/bitbot-trader",
-              "mikaelwikman/bitstamp-realtime",
-              "Netherdrake/bitstampplus",
-              "wasabit/bitstampprice",
-              "joggyjog/bitstampapi",
-              "slickage/bitstamped",
-              "sogasg/BitstampCollector",
-              "x89/BitstampWidget",
-              "stoko/bitstampAPIBridge",
-              "GildedHonour/BitstampApi",
-              "smartdan/BitstampClient",
-              "flycodepl/bitstamp_ticker",
-              "abwaters/bitstamp-api",
-              "zhzhussupovkz/bitstamp-api"
+              {user: "nanotube", repo: "supybot-bitcoin-marketmonitor"},
+              {user: "goteppo", repo: "ArBit"},
+              {user: "Sprylitol", repo: "btc-e_Trade_bot"},
+              {user: "hyppo", repo: "Redbit"},
+              {user: "mathisonian", repo: "benjamin"},
+              {user: "wildbunny", repo: "bitcoinTradingFramework"},
+              {user: "therussianphysicist", repo: "btc-trader"},
+              {user: "JulyIGHOR", repo: "QtBitcoinTrader"},
+              {user: "maxme", repo: "bitcoin-arbitrage"},
+              {user: "gferrin", repo: "bitfinex"},
+              {user: "lookfirst", repo: "bitfinex-promise"},
+              {user: "ziggamon", repo: "node-bitcoin-trader"},
+              {user: "Sea-of-BTC", repo: "Bitcoin-Trading-Client"},
+              {user: "ipsBruno", repo: "trade-bot-btce"},
+              {user: "maxcountryman", repo: "cryptotrade"},
+              {user: "guifre", repo: "BTCWolf"},
+              {user: "brandonrobertz", repo: "virtualcurrency-trading-alerts"},
+              {user: "cheseaux", repo: "BitcoinTradingSystem"},
+              {user: "pubnub", repo: "pubnub-bitcoin"},
+              {user: "pentarh", repo: "btctrading-lib"},
+              {user: "jwilkins", repo: "bitfinex"},
+              {user: "scottbarr", repo: "bitfinex"},
+              {user: "golikcoin", repo: "BitFinex"},
+              {user: "v4n", repo: "bitfinex"},
+              {user: "coolacid", repo: "bfxtrade"},
+              {user: "npp1993", repo: "bitfinex-api"},
+              {user: "gitmens", repo: "BitfinexToday"},
+              {user: "twobeeb", repo: "BitfinexAPI"},
+              {user: "KobeLeysen", repo: "BitfinexAPI"},
+              {user: "fractaldroid", repo: "bitfinex_orderbook"},
+              {user: "velhoti", repo: "Cbot-Bitfinex"},
+              {user: "NoWayHoze", repo: "nowayhoze.bitfinex"},
+              {user: "evdubs", repo: "Harmonia"},
+              {user: "MarkusTeufelberger", repo: "bitfinex2ledger"},
+              {user: "caktux", repo: "bitfinex_api_python"},
+              {user: "mariodian", repo: "bitfinex-auto-lend"},
+              {user: "NoWayHoze", repo: "b___del_this"},
+              {user: "dutchcoders", repo: "tradecollector"},
+              {user: "cassus", repo: "btc-trader"},
+              {user: "cthunman", repo: "btc_py_arb"},
+              {user: "Herka", repo: "Bitcoin-Python-Livecharts"},
+              {user: "sam808", repo: "mint-bitcoin"},
+              {user: "brendanjcaffrey", repo: "bitcoin-notification-center-widget"},
+              {user: "wijagels", repo: "btc-price-check"},
+              {user: "pentarh", repo: "btctrading-lib"},
+              {user: "tech-no-crat", repo: "bitcoineer"},
+              {user: "kushti", repo: "btce-scala"},
+              {user: "orangeudav", repo: "bitcoin_tools"},
+              {user: "aandrewjeski", repo: "arcade"},
+              {user: "ericjang", repo: "cryptocurrency_arbitrage"},
+              {user: "kevinjcash", repo: "bitbot"},
+              {user: "ssgier", repo: "Brahmian2"},
+              {user: "pejrak", repo: "stampede"},
+              {user: "kanybal", repo: "bitcoins"},
+              {user: "towski", repo: "bitcoin_trader"},
+              {user: "mateodelnorte", repo: "coinbase"},
+              {user: "trexmatt", repo: "OKCoin-API"},
+              {user: "siclark", repo: "btcchina"},
+              {user: "opaolini", repo: "python-bitcurex"},
+              {user: "voidloop", repo: "krakenapi"},
+              {user: "5an1ty", repo: "kraken-api"},
+              {user: "Beldur", repo: "kraken-go-api-client"},
+              {user: "veox", repo: "python3-krakenex"},
+              {user: "yfme", repo: "BTCChinaTrade"},
+              {user: "dyzz", repo: "btcchina"},
+              {user: "TerrorJack", repo: "btcchina.py"},
+              {user: "zfei", repo: "btcchina-bot"},
+              {user: "tjulk", repo: "Btcchina"},
+              {user: "siclark", repo: "btcchina"},
+              {user: "qinjiandong2010", repo: "btcchina"},
+              {user: "GeforceLee", repo: "BtcChina"},
+              {user: "prinyap", repo: "btcchina"},
+              {user: "shallwe", repo: "btcchina_agent"},
+              {user: "Lewis-Clayton", repo: "Kublai"},
+              {user: "BTCChina", repo: "btcchina-api-cpp"},
+              {user: "BTCChina", repo: "btcchina-websocket-api-python"},
+              {user: "hemon", repo: "btcchina-php-sdk"},
+              {user: "domnli", repo: "btcchina.api"},
+              {user: "agent462", repo: "chinashop"},
+              {user: "sathoro", repo: "BTCChina-MarketMaker"},
+              {user: "osleg", repo: "btcchinaBot"},
+              {user: "Shieffan", repo: "btcchina_deal"},
+              {user: "lamassu", repo: "lamassu-btcchina"},
+              {user: "dasixi", repo: "bitbot-btcchina"},
+              {user: "shuaishuai", repo: "btcchina-cli"},
+              {user: "buluzhai", repo: "btcchina-enhancement"},
+              {user: "xianda", repo: "btcchina-python-api"},
+              {user: "goace", repo: "bitcoin-ticker"},
+              {user: "wulinlw", repo: "btcchina_php_api"},
+              {user: "carica", repo: "btcchina-websocket-api"},
+              {user: "kasuganosora", repo: "nodeBtcchinaapi"},
+              {user: "rarach", repo: "exchange-bots"},
+              {user: "tonychee7000", repo: "BtcChinaRT"},
+              {user: "sirkapore", repo: "kraken_watch"},
+              {user: "greentheo", repo: "krakenForR"},
+              {user: "pstauble", repo: "BTC-Trend-Algorithm"},
+              {user: "veox", repo: "krakenex"},
+              {user: "payward", repo: "kraken-api-client"},
+              {user: "nothingisdead", repo: "npm-kraken-api"},
+              {user: "kraken-io", repo: "kraken-ruby"},
+              {user: "leishman", repo: "kraken_ruby"},
+              {user: "Jonahss", repo: "bitstamp-request"},
+              {user: "logicalwire", repo: "bitstamp-API"},
+              {user: "canselcik", repo: "bitstamp_stoploss"},
+              {user: "francesco-bracchi", repo: "bitstamp-api"},
+              {user: "jdilag", repo: "bitstamp-angular"},
+              {user: "michie1", repo: "Bitstamp-notifier"},
+              {user: "9uuso", repo: "bitstamp-vwap"},
+              {user: "tgerring", repo: "bitstamp-js"},
+              {user: "BitcoinMafia", repo: "bitstamp_api"},
+              {user: "PamExx", repo: "Bitcoin---Bitstamp"},
+              {user: "sirloins", repo: "bitstamp_utils"},
+              {user: "makevoid", repo: "bitstamp_bot"},
+              {user: "jesuRule", repo: "custom_bitstamp"},
+              {user: "socec", repo: "bitstamp-simple"},
+              {user: "maxtsepkov", repo: "nodejs-bitstamp2"},
+              {user: "liw0", repo: "pyBitstampTicker"},
+              {user: "conejoninja", repo: "bitstamp-php-api"},
+              {user: "LuKaa", repo: "Bitstamp-API-CSharp"},
+              {user: "ghandmann", repo: "perl-webservice-bitstamp"},
+              {user: "alstonfernandez21", repo: "bitstamp_python_api"},
+              {user: "ericcj24", repo: "bitstamp.api.monitor1"},
+              {user: "peawormsworth", repo: "Finance-BitStamp-Socket"},
+              {user: "kojnapp", repo: "bitstamp"},
+              {user: "askmike", repo: "bitstamp"},
+              {user: "migrap", repo: "Bitstamp"},
+              {user: "kmadac", repo: "bitstamp-python-client"},
+              {user: "unwitting", repo: "bitstampy"},
+              {user: "willmoss", repo: "bitstamp-php-api"},
+              {user: "nyg", repo: "bitstamp-ticker"},
+              {user: "isotope11", repo: "bitstampede"},
+              {user: "lamassu", repo: "lamassu-bitstamp"},
+              {user: "pulsecat", repo: "cryptrade"},
+              {user: "askmike", repo: "bitstamp-ws"},
+              {user: "mmazi", repo: "bitstamp-api"},
+              {user: "hivewallet", repo: "hiveapp-bitstamp"},
+              {user: "matmar10", repo: "bitstamp"},
+              {user: "esneider", repo: "bitstamp"},
+              {user: "LoufL", repo: "bitstamp"},
+              {user: "hanklords", repo: "bitstamp"},
+              {user: "tgerring", repo: "hiveapp-bitstamptrader"},
+              {user: "apancutt", repo: "bitstamp-api-php"},
+              {user: "newell-purdue", repo: "bitstamper"},
+              {user: "cgag", repo: "bitstamp-client"},
+              {user: "5an1ty", repo: "bitstamp-api"},
+              {user: "ajph", repo: "bitstamp-go"},
+              {user: "ajph", repo: "ArBit"},
+              {user: "goteppo", repo: "bitstamp-go"},
+              {user: "Narsil", repo: "bitstamp-go"},
+              {user: "indrekj", repo: "bitbot-trader"},
+              {user: "mikaelwikman", repo: "bitstamp-realtime"},
+              {user: "Netherdrake", repo: "bitstampplus"},
+              {user: "wasabit", repo: "bitstampprice"},
+              {user: "joggyjog", repo: "bitstampapi"},
+              {user: "slickage", repo: "bitstamped"},
+              {user: "sogasg", repo: "BitstampCollector"},
+              {user: "x89", repo: "BitstampWidget"},
+              {user: "stoko", repo: "bitstampAPIBridge"},
+              {user: "GildedHonour", repo: "BitstampApi"},
+              {user: "smartdan", repo: "BitstampClient"},
+              {user: "flycodepl", repo: "bitstamp_ticker"},
+              {user: "abwaters", repo: "bitstamp-api"},
+              {user: "zhzhussupovkz", repo: "bitstamp-api"}
             ];
 
-repos.forEach(function(repo){
-  var url = "http://github.com/" + repo + "/graphs/contributors-data";
+console.log("Number of repos = " + repos.length);
+console.log(repos);
 
-  var getContributorsQuery = "select * from json where url='" + url + "'";
-
-  console.log(getContributorsQuery);
-
-  new yql.exec(getContributorsQuery, function(response) {
-    console.log(response);
-    if(response.query != null){
-      if(response.query.results != null){
-        if(response.query.results.json != null){
-          if(response.query.results.json.json != null){
-            var authors = response.query.results.json.json;
-            authors.forEach(function(author){
-              logins.push(author.author.login);
-            });
-          }
-        }
-      }
+github.user.getFrom({
+    user: login
+}, function(err, res) {
+    console.log("\n\n");
+    if(res.email !== undefined){
+      console.log(res.email);
+      callback(res.email);
     }
-    console.log(logins);
-
-    var queryFuncs = Array();
-
-    logins.forEach(function(login){
-      contacts[login] = Object();
-      contacts[login].repo = repo;
-
-      var url = "http://github.com/" + login;
-
-      var getEmailQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.email'";
-
-      queryFuncs.push(function(callback){
-          new yql.exec(getEmailQuery, function(response) {
-            // console.log(response.query.results.results);
-            if(response.query.results.results != null){
-              if(response.query.results.results.a != null){
-                var email = response.query.results.results.a.content;
-                contacts[login].email = email;
-              }
-            }
-            callback();
-          });
-      });
-
-      var getNameQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.vcard-fullname'";
-
-      queryFuncs.push(function(callback){
-          new yql.exec(getNameQuery, function(response) {
-            // console.log(response.query.results.results);
-            if(response.query.results.results != null ){
-              if(response.query.results.results.span != null){
-                var name = response.query.results.results.span.content;
-                contacts[login].name = name;
-              }
-            }
-            callback();
-          });
-      });
-
-    });
-
-    async.parallel(queryFuncs, function(){
-      console.log(contacts);
-      saveFiles(contacts);
-    });
-
-  });
 });
+
+// repos.forEach(function(repo){
+//   var url = "http://github.com/" + repo + "/graphs/contributors-data";
+//
+//   var getContributorsQuery = "select * from json where url='" + url + "'";
+//
+//   console.log(getContributorsQuery);
+//
+//   new yql.exec(getContributorsQuery, function(response) {
+//     console.log(response);
+//     if(response.query != null){
+//       if(response.query.results != null){
+//         if(response.query.results.json != null){
+//           if(response.query.results.json.json != null){
+//             var authors = response.query.results.json.json;
+//             authors.forEach(function(author){
+//               logins.push(author.author.login);
+//             });
+//           }
+//         }
+//       }
+//     }
+//     console.log(logins);
+//
+//     var queryFuncs = Array();
+//
+//     logins.forEach(function(login){
+//       contacts[login] = Object();
+//       contacts[login].repo = repo;
+//
+//       var url = "http://github.com/" + login;
+//
+//       var getEmailQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.email'";
+//
+//       queryFuncs.push(function(callback){
+//           new yql.exec(getEmailQuery, function(response) {
+//             // console.log(response.query.results.results);
+//             if(response.query.results.results != null){
+//               if(response.query.results.results.a != null){
+//                 var email = response.query.results.results.a.content;
+//                 contacts[login].email = email;
+//               }
+//             }
+//             callback();
+//           });
+//       });
+//
+//       var getNameQuery = "SELECT * FROM data.html.cssselect WHERE url='" + url + "' AND css='.vcard-fullname'";
+//
+//       queryFuncs.push(function(callback){
+//           new yql.exec(getNameQuery, function(response) {
+//             // console.log(response.query.results.results);
+//             if(response.query.results.results != null ){
+//               if(response.query.results.results.span != null){
+//                 var name = response.query.results.results.span.content;
+//                 contacts[login].name = name;
+//               }
+//             }
+//             callback();
+//           });
+//       });
+//
+//     });
+//
+//     async.parallel(queryFuncs, function(){
+//       console.log(contacts);
+//       saveFiles(contacts);
+//     });
+//
+//   });
+// });
+
+function getContributors(repo, callback){
+
+}
+
+function getEmailForUser(login, callback){
+  github.user.getFrom({
+      user: login
+  }, function(err, res) {
+      console.log("\n\n");
+      if(res.email !== undefined){
+        console.log(res.email);
+        callback(res.email);
+      }
+  });
+}
 
 function saveFiles(contacts){
   var outputFilename = './contacts.json';
