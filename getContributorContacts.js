@@ -196,10 +196,10 @@ console.log("Number of repos = " + repos.length);
 
 var users = Array();
 
-var queryFuncs = Array();
+var repoQueryFuncs = Array();
 
 repos.forEach(function(repo){
-  queryFuncs.push(function(callback){
+  repoQueryFuncs.push(function(callback){
       getContributorsForRepo(repo.user, repo.repo, function(contributors){
         users = users.concat(contributors);
         callback();
@@ -207,7 +207,7 @@ repos.forEach(function(repo){
   });
 });
 
-async.parallel(queryFuncs, function(){
+async.parallel(repoQueryFuncs, function(){
   //remove duplicates from array
   console.log(users);
   console.log("length of users array: " + users.length);
@@ -220,10 +220,27 @@ async.parallel(queryFuncs, function(){
 
   console.log("length of unique users array: " + uniqueUsers.length);
 
+  var emailQueryFuncs = Array();
+
   uniqueUsers.forEach(function(user){
-    // if(user !== undefined)
-    console.log(user.login);
+    emailQueryFuncs.push(function(callback){
+        getEmailForUser(user.login, function(email){
+          if(email !== null){
+            user.email = email;
+            console.log(email);
+          }
+          callback();
+        });
+    });
   });
+
+  async.parallel(emailQueryFuncs, function(){
+    // users.forEach(function(user){
+    //   console.log(user);
+    // });
+    console.log(users);
+  });
+
 });
 
 function uniqueBy(a, key) {
@@ -250,7 +267,7 @@ function getEmailForUser(login, callback){
       user: login
   }, function(err, res) {
       console.log("\n\n");
-      if(res.email !== undefined){
+      if(res !== undefined){
         // console.log(res.email);
         callback(res.email);
       }
