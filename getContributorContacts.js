@@ -201,7 +201,18 @@ var repoQueryFuncs = Array();
 repos.forEach(function(repo){
   repoQueryFuncs.push(function(callback){
       getContributorsForRepo(repo.user, repo.repo, function(contributors){
-        users = users.concat(contributors);
+
+        // delete contributors.meta;
+        // console.log(contributors.length);
+        if(contributors !== undefined){
+          if(contributors.length !== undefined){
+            contributors.forEach(function(contributor){
+              contributor.bitcoinrepo = repo.repo;
+            });
+            users = users.concat(contributors);
+          }
+        }
+
         callback();
       });
   });
@@ -224,19 +235,30 @@ async.parallel(repoQueryFuncs, function(){
 
   uniqueUsers.forEach(function(user){
     emailQueryFuncs.push(function(callback){
-        getEmailForUser(user.login, function(email){
-          user.email = email;
-          console.log(email);
-          callback();
+        // getEmailForUser(user.login, function(email){
+        //   user.email = email;
+        //   console.log(email);
+        //   callback();
+        // });
+        github.user.getFrom({
+            user: user.login
+        }, function(err, res) {
+            console.log("\n\n");
+            console.log(res);
+            if(res !== undefined){
+              user.email = res.email;
+              user.name = res.name;
+            }
+            callback();
         });
     });
   });
 
   async.parallel(emailQueryFuncs, function(){
-    
+    console.log("\n\n*************FINISHED EMAIL QUERYS*************\n\n")
     //filter users with no email addresses
     uniqueUsers = uniqueUsers.filter(function(user){
-      return(user.email !== undefined);
+      return(user.email !== undefined && user.email !== null && user.email !== "");
     });
 
     console.log(uniqueUsers);
@@ -266,17 +288,17 @@ function getContributorsForRepo(user, repoName, callback){
   });
 }
 
-function getEmailForUser(login, callback){
-  github.user.getFrom({
-      user: login
-  }, function(err, res) {
-      console.log("\n\n");
-      if(res !== undefined){
-        // console.log(res.email);
-        callback(res.email);
-      }
-  });
-}
+// function getEmailForUser(login, callback){
+//   github.user.getFrom({
+//       user: login
+//   }, function(err, res) {
+//       console.log("\n\n");
+//       if(res !== undefined){
+//         // console.log(res.email);
+//         callback(res.email);
+//       }
+//   });
+// }
 
 function saveToJSON(contacts){
   var outputFilename = './contacts.json';
