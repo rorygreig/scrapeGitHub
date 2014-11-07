@@ -88,7 +88,7 @@
         "site_admin": false,
         "contributions": 17,
         "bitcoinrepo": "supybot-bitcoin-marketmonitor",
-        "email": "[same as my github username] at gmail.com",
+        "email": "nanotube@gmail.com",
         "name": null
     },
     {
@@ -366,29 +366,6 @@
         "bitcoinrepo": "QtBitcoinTrader",
         "email": "ea333@freemail.hu",
         "name": "Andras Elso"
-    },
-    {
-        "login": "naddison36",
-        "id": 6491112,
-        "avatar_url": "https://avatars.githubusercontent.com/u/6491112?v=2",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/naddison36",
-        "html_url": "https://github.com/naddison36",
-        "followers_url": "https://api.github.com/users/naddison36/followers",
-        "following_url": "https://api.github.com/users/naddison36/following{/other_user}",
-        "gists_url": "https://api.github.com/users/naddison36/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/naddison36/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/naddison36/subscriptions",
-        "organizations_url": "https://api.github.com/users/naddison36/orgs",
-        "repos_url": "https://api.github.com/users/naddison36/repos",
-        "events_url": "https://api.github.com/users/naddison36/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/naddison36/received_events",
-        "type": "User",
-        "site_admin": false,
-        "contributions": 19,
-        "bitcoinrepo": "bitfinex",
-        "email": "nick@addisonbrown.com.au",
-        "name": "Nick Addison"
     },
     {
         "login": "maxme",

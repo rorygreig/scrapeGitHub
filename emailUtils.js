@@ -17,11 +17,14 @@ function setupTransporter(sender, password, service){
   });
 }
 
-function sendColdEmail(recipient, name, repo){
+function sendColdEmail(recipient, name, repo, callback){
   //get first name from full name
-  var firstName = name.split(" ")[0];
-  if(firstName === undefined){
-    firstName = "there";
+  var firstName = "there";
+  if(name !== null){
+    var firstName = name.split(" ")[0];
+    if(firstName === undefined){
+      firstName = "there";
+    }
   }
 
   var subject = "Bitcoin multi exchange margin trading service for automated traders";
@@ -32,7 +35,7 @@ function sendColdEmail(recipient, name, repo){
   message += " I am getting in touch to see if you would be interested in borrowing bitcoin for trading.</div><br></br>";
   message += "<div>My company, <a href='www.trademoremargin.com'>TradeMore</a>, provides a bitcoin lending service to facilitate leveraged trading for bitcoin traders. We take deposits from lenders who want to earn a return on their bitcoin holdings, and lend these funds to traders like yourself on bitcoin exchanges.</div><br></br>";
   message += "<div>We have a partnership with <a href='www.coinfloor.co.uk'>Coinfloor</a> and are currently offering our service there, but we are also expanding to more exchanges.</div><br></br>";
-  message += "<div>If you are interested in our service please let us know and we would be happy to provide more details.</div><br></br>";
+  message += "<div>If you are interested in our service please let us know. We would love to chat and provide you more details.</div><br></br>";
   message += "<div>Best regards,</div>";
   message += "<div>Rory Greig</div>";
   message += "</body></html>";
@@ -49,7 +52,8 @@ function sendColdEmail(recipient, name, repo){
       if(error){
           console.log(error);
       }else{
-          console.log('Message sent: ' + info.response);
+          // console.log('Message sent: ' + info.response);
+          callback(info.response);
       }
   });
 

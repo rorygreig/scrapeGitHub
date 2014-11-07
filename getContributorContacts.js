@@ -235,11 +235,6 @@ async.parallel(repoQueryFuncs, function(){
 
   uniqueUsers.forEach(function(user){
     emailQueryFuncs.push(function(callback){
-        // getEmailForUser(user.login, function(email){
-        //   user.email = email;
-        //   console.log(email);
-        //   callback();
-        // });
         github.user.getFrom({
             user: user.login
         }, function(err, res) {
@@ -255,7 +250,7 @@ async.parallel(repoQueryFuncs, function(){
   });
 
   async.parallel(emailQueryFuncs, function(){
-    console.log("\n\n*************FINISHED EMAIL QUERYS*************\n\n")
+
     //filter users with no email addresses
     uniqueUsers = uniqueUsers.filter(function(user){
       return(user.email !== undefined && user.email !== null && user.email !== "");
@@ -287,18 +282,6 @@ function getContributorsForRepo(user, repoName, callback){
       callback(res);
   });
 }
-
-// function getEmailForUser(login, callback){
-//   github.user.getFrom({
-//       user: login
-//   }, function(err, res) {
-//       console.log("\n\n");
-//       if(res !== undefined){
-//         // console.log(res.email);
-//         callback(res.email);
-//       }
-//   });
-// }
 
 function saveToJSON(contacts){
   var outputFilename = './contacts.json';
