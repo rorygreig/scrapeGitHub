@@ -11,4 +11,4 @@ var alertPassword = 'C0ns1d3rPhl!!BB';
 var email = new emailSender(alertSender, alertPassword, 'zoho');
 
 email.sendColdEmail("rorygreig@gmail.com", "Rory Greig", "Coinfloor");
-email.sendColdEmail("stewartkdouglas@gmail.com", "Stewart", "Coinfloor");
+console.log(contacts);

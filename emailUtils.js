@@ -19,7 +19,10 @@ function setupTransporter(sender, password, service){
 
 function sendColdEmail(recipient, name, repo){
   //get first name from full name
-  var firstName = name;
+  var firstName = name.split(" ")[0];
+  if(firstName === undefined){
+    firstName = "there";
+  }
 
   var subject = "Bitcoin multi exchange margin trading service for automated traders";
 
