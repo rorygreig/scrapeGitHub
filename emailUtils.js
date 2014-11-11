@@ -57,6 +57,45 @@ function sendColdEmail(recipient, name, repo, callback){
       }
   });
 
+}
+
+function sendFollowUpEmail(recipient, name, repo, callback){
+  //get first name from full name
+  var firstName = "there";
+  if(name !== null){
+    var firstName = name.split(" ")[0];
+    if(firstName === undefined){
+      firstName = "there";
+    }
+  }
+
+  var subject = "Bitcoin multi exchange margin trading";
+
+  var message = "<html><body>"
+  message += "<div>Hi " + firstName + ",</div><br></br>";
+  message += "<div>It’s Rory from Trademore here. Just wondering if you got a chance to check out our bitcoin margin trading <a href='www.trademoremargin.com'>service</a>.</div><br></br>";
+  message += "<div>We currently have a partnership with the <a href='www.coinfloor.co.uk'>Coinfloor</a> exchange, and we can also provide our service on other exchanges depending on your requirements.</div><br></br>";
+  message += "<div>Let us know if you have any questions, we are more than happy to have a chat over the phone to see how we can help you out with Bitcoin trading.</div><br></br>";
+  message += "<div>Best regards,</div>";
+  message += "<div>Rory Greig</div>";
+  message += "</body></html>";
+
+  var mailOptions = {
+      from: this.sender,
+      to: recipient,
+      subject: subject,
+      html: message
+  };
+
+  // send mail with defined transport object
+  this.transporter.sendMail(mailOptions, function(error, info){
+      if(error){
+          console.log(error);
+      }else{
+          // console.log('Message sent: ' + info.response);
+          callback(info.response);
+      }
+  });
 
 }
 

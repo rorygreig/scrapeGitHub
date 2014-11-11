@@ -1,9 +1,6 @@
-var yql = require('yql');
 var async = require('async');
 var fs = require('fs');
 var GitHubApi = require("github");
-
-//TODO: could use github API wrapper package: https://www.npmjs.org/package/github
 
 var contacts = Object();
 var logins = Array();
@@ -250,11 +247,6 @@ async.parallel(repoQueryFuncs, function(){
   });
 
   async.parallel(emailQueryFuncs, function(){
-
-    //filter users with no email addresses
-    uniqueUsers = uniqueUsers.filter(function(user){
-      return(user.email !== undefined && user.email !== null && user.email !== "");
-    });
 
     console.log(uniqueUsers);
 

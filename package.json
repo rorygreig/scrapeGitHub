@@ -1,7 +1,6 @@
 {
   "name": "scrapeGitHub",
   "dependencies": {
-    "yql": "",
     "async": "",
     "request": "",
     "github": ""

@@ -1,90 +1,94 @@
 var emailSender = require('./emailUtils.js');
 var contacts = require('./contacts.json');
-
-// contacts.forEach(function(contact){
-//
-// });
+var async = require('async');
 
 var alertSender = 'rory@trademoremargin.com';
 var alertPassword = 'C0ns1d3rPhl!!BB';
 
 var email = new emailSender(alertSender, alertPassword, 'zoho');
 
-var alreadySent = [
-  "juuso@mail.com",
-  "harrison@seaofbtc.com",
-  "cheseauxjonathan@gmail.com",
-  "galaviz@hybridgroup.com",
-  "scarduzio@gmail.com",
-  "selcik2@illinois.edu",
-  "prinya.pongdontri@gmail.com",
-  "github.com@btcchina.com",
-  "teward@ubuntu.com",
-  "josh@vitamin-j.com",
-  "lewis.clayton@forward3d.com",
-  "michael@ndrix.org",
-  "sean@tox.im",
-  "jeffrey.wilcke@icloud.com",
-  "thung1@binghamton.edu",
-  "james@slickage.com",
-  "veox@wemakethings.net",
-  "alexxy@gentoo.org",
-  "veox@wemakethings.net",
-  "ea333@freemail.hu",
-  "latchkey@gmail.com",
-  "maxime@maximevalette.com",
-  "luke+github_public@dashjr.org",
-  "lacatusu.valeriu@gmail.com",
-  "jakendall@coolacid.net",
-  "brendan@jcaffrey.com",
-  "tagrain@gmail.com",
-  "iam@zfei.me",
-  "stephen@pubnub.com",
-  "ryan@trycaviar.com",
-  "justinarthur@gmail.com",
-  "github@trailbeans.eu",
-  "support@bitdeli.com",
-  "matthewdanielperkins@gmail.com",
-  "maxime.biais@gmail.com",
-  "418005608@qq.com",
-  "julyighor@gmail.com",
-  "connor@sphinx.io",
-  "aandrewjeski@gmail.com",
-  "me@gildedhonour.com",
-  "theodore.vanrooy@gmail.com",
-  "khertan@khertan.net",
-  "rubencallewaertdev@gmail.com",
-  "thunman@gmail.com",
-  "madaokuan@gmail.com",
-  "jackprestonuk@gmail.com",
-  "guifre.ruiz@owasp.org",
-  "lewis.clayton@forward3d.com",
-  "qycpublic@gmail.com",
-  "maxc@me.com",
-  "github@mathisonian.com",
-  "jed@jedsmith.org",
-  "nanotube@gmail.com",
-  "teppo.salonen@gmail.com",
-  "spry@sdf.org"
-]
+var excludedEmails = [
+  "david.francois@webflows.fr",
+  "vassilis@graffiti.net",
+  "axl@todojuegos.com",
+  "erland@lewin.nu",
+  "mezrinv@gmail.com",
+  "bryan4887@gmail.com",
+  "piotr.ladyzynski@gmail.com",
+  "byvoid@byvoid.com",
+  "krystian.nowak@gmail.com",
+  "r.krupinski@gmail.com",
+  "kpysniak@gmail.com",
+  "veken0m.apps@gmail.com",
+  "g.rowe@froot.co.uk",
+  "zhoushuqun@gmail.com",
+  "james.p.edwards42@gmail.com",
+  "matija.mazi@gmail.com",
+  "nick@addisonbrown.com.au",
+  "marinostheoharis@gmail.com",
+  "matej.jack@gmail.com",
+  "miles.chet@gmail.com",
+  "linkedin@campbx.com, keyur@campbx.com",
+  "eric.von.guttenberg@gmail.com",
+  "marin.basic02@gmail.com",
+  "christos.porios@gmail.com",
+  "eric_jang@brown.edu",
+  "thisisforschool3@gmail.com",
+  "migrap@gmail.com",
+  "mikael@wikman.me",
+  "jay.y.berg@gmail.com",
+  "harounkola@gmail.com",
+  'michael@ultrapresence.net',
+  'sam.clare78@gmail.com',
+  'tadej.tadej@gmail.com',
+  'oskar.paolini@gmail.com',
+  'marzell.camenzind@gmail.com',
+  'carl@centrabit.com',
+];
 
 console.log(contacts.length);
 
 var counter = 0;
 
+var sentEmails = Array();
+var emailFuncs = Array();
+
 contacts.forEach(function(contact){
-  if(alreadySent.indexOf(contact.email) == -1){
+  if(excludedEmails.indexOf(contact.email) == -1){
     console.log(contact.email);
     console.log(contact.name);
     console.log(contact.bitcoinrepo);
 
-    email.sendColdEmail(contact.email, contact.name, contact.bitcoinrepo, function(response){
-      console.log(response);
-      if(response.indexOf("250") > -1){
-        alreadySent.push(contact.email);
-        console.log("Sent email to: " + contact.email);
-        counter++;
-      }
+    emailFuncs.push(function(callback){
+      email.sendFollowUpEmail(contact.email, contact.name, contact.bitcoinrepo, function(response){
+        console.log(response);
+        if(response.indexOf("250") > -1){
+          sentEmails.push(contact.email);
+          console.log("Sent email to: " + contact.email);
+          counter++;
+          callback();
+        }
+      });
     });
   }
 });
+
+async.series(emailFuncs, function(){
+  console.log(sentEmails);
+  console.log("Sent " + sentEmails.length + " emails");
+  excldudedEmails = excludedEmails.append(sentEmails);
+  saveToJSON(excludedEmails);
+});
+
+function saveToJSON(contacts){
+  var outputFilename = './excludedEmails.json';
+
+  fs.appendFile(outputFilename, JSON.stringify(contacts, null, 4), function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("JSON saved to " + outputFilename);
+      }
+  });
+
+}
