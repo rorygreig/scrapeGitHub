@@ -4,6 +4,7 @@ var emailSender = function(sender, password, service) {
     this.transporter = setupTransporter(sender, password, service);
     this.sender = sender;
     this.sendColdEmail = sendColdEmail;
+    this.sendFollowUpEmail = sendFollowUpEmail;
 }
 
 function setupTransporter(sender, password, service){
