@@ -1,4 +1,4 @@
 scrapeGitHub
 ============
 
-Scrape useful information from github, such as all contributors to a project and their emails
+NodeJS script to get useful information from github, such as all contributors to a project and their emails
